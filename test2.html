@@ -1,0 +1,651 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+<meta charset="UTF-8">
+<title>Excel Imtihon</title>
+<style>
+body {
+    font-family: Arial, sans-serif;
+    background: url(image.png) center / cover no-repeat;
+    position: relative;
+    padding: 20px;
+}
+.container {
+    max-width: 800px;
+    margin: auto;
+    background: #fff;
+    padding: 20px;
+    border-radius: 8px;
+}
+h1 {
+    text-align: center;
+}
+.question {
+    margin-bottom: 15px;
+}
+.answers label {
+    display: block;
+    margin-left: 10px;
+}
+button {
+    width: 100%;
+    padding: 12px;
+    font-size: 16px;
+    background: #007bff;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+}
+button:hover {
+    background: #0056b3;
+}
+.result {
+    margin-top: 20px;
+    padding: 15px;
+    font-size: 18px;
+    text-align: center;
+    border-radius: 6px;
+}
+.pass {
+    background: #d4edda;
+    color: #155724;
+}
+.fail {
+    background: #f8d7da;
+    color: #721c24;
+}
+.timer {
+    position: fixed;
+    top: 20px;
+    right: 30px;
+    background: rgba(0,0,0,0.75);
+    color: #fff;
+    padding: 10px 18px;
+    font-size: 22px;
+    font-weight: bold;
+    border-radius: 8px;
+    z-index: 999;
+}
+
+</style>
+</head>
+<body>
+
+<div class="container">
+<div class="timer" id="timer">50:00</div>
+<h1>EXCEL IMTIHON TESTI</h1>
+
+<form id="quizForm"></form>
+
+<button id="submitBtn" onclick="send()"  disabled>Natijani ko‘rish</button>
+<div id="result"></div>
+</div>
+
+<script>
+const questions = [
+ 
+
+{q:"1. =СУММ(3^2; ABS(-5)) * ОКРУГЛ(СРЗНАЧ(5;10;15);1) natijasi?", 
+a:["140","210","280","350"], c:1},
+
+{q:"2. =ПРОИЗВЕД(НОД(12;3); ЦЕЛОЕ(13/4)) + КОРЕНЬ(СТЕПЕНЬ(3;4)) + ЛОГ10(СУММ(50;10)) ?", 
+a:["18","20","22","24"], c:2},
+
+{q:"3. =ОСТАТ(СТЕПЕНЬ(3;2);7) - СРЗНАЧ(ABS(-10);2;3) + МАКС(КОРЕНЬ(36); ЛОГ(27;3); 8) ?", 
+a:["5","6","7","8"], c:1},
+
+{q:"4. =МИН(ОКРУГЛ(12,33;0);17;8) - ФАКТР(ЦЕЛОЕ(3,9)) + НОК(СТЕПЕНЬ(3;2);6) ?", 
+a:["10","12","14","16"], c:0},
+
+{q:"5. =И(НЕ(2>4); ИЛИ(2=3; 5<4)) natijasi?", 
+a:["TRUE","FALSE","#VALUE!","#N/A"], c:1},
+
+{q:"6. =ЕСЛИ(ДЛСТР(\"maktab\")>5; \"ali\"; \"vali\") ?", 
+a:["ali","vali","#ERROR","0"], c:0},
+
+{q:"7. =СЦЕПИТЬ(ЛЕВСИМВ(\"Axrorjon\";2); ПРАВСИМВ(\"Erkaboyev\";5)) ?", 
+a:["Axoyev","Axoyev","Axboev","Axoyev"], c:0},
+
+{q:"8. =ПСТР(\"Fizika\"; НАЙТИ(\"i\";\"Matematika\");2) ?", 
+a:["iz","zi","ik","#VALUE!"], c:0},
+
+{q:"9. Agar A1=10, B1=9, C1=B1-A1 bo‘lsa, =ДЕСВ.ДВ(C1) natija?", 
+a:["-1","#NUM!","11111111","0"], c:1},
+
+{q:"10. =МАКС(1;2;3;МИН(5;6;7);СРЗНАЧ(10;20)) ?", 
+a:["10","15","20","7"], c:1},
+
+{q:"11. =ЕСЛИ(И(5>3; ИЛИ(2>3; 4<6)); 100; 200) ?", 
+a:["100","200","#VALUE!","0"], c:0},
+
+{q:"12. =СУММПРОИЗВ({1;2;3};{4;5;6}) ?", 
+a:["28","32","30","35"], c:1},
+
+{q:"13. =СЧЁТЕСЛИ({1;2;3;4;5};\">3\") ?", 
+a:["1","2","3","4"], c:1},
+
+{q:"14. =ПОИСКПОЗ(5;{1;3;5;7;9};0) ?", 
+a:["2","3","4","#N/A"], c:1},
+
+{q:"15. =ИНДЕКС({10;20;30;40}; ПОИСКПОЗ(30;{10;20;30;40};0)) ?", 
+a:["20","30","40","#N/A"], c:1},
+
+{q:"16. =ВПР(3;{1,10;2,20;3,30;4,40};2;ЛОЖЬ) ?", 
+a:["20","30","40","#N/A"], c:1},
+
+{q:"17. =СУММ(ЕСЛИ({1;2;3;4}>2;{10;20;30;40})) ?", 
+a:["70","60","50","90"], c:0},
+
+{q:"18. Yangi slayd qoyish uchun qaysi klavishlar kombinatsiyasi ishlatiladi?", 
+a:["CTRL + M","CTRL + SHIFT + M","ALT + M","SHIFT + M"], c:0},
+
+{q:"19. prezentatsiyani boshidan boshlash uchun qaysi klavishlar kombinatsiyasi ishlatiladi?", 
+a:["CTRL + F5","F5","SHIFT + 5","ALT + F5"], c:0},
+
+{q:"20. Excelda 45-ustun qaysi harf bilan belgilanadi", 
+a:["AR","AS","AJ","AH"], c:1},
+
+{q:"21. B2 dan G6 ga Deapazonda nechta yacheyka bor?", 
+a:["30","38","45","27"], c:0},
+
+{q:"22. D2 katakta A2+B2+C2 yigindisini natijasni toping  A9 B6 C8 D =B1*целое(С1/A1), =корен(A1)+2 пстр((B1+C1),1,1)",
+
+a:["1","3","6","7"], c:2},
+
+{q:"23. PowerPointda yangi presentatsiya ochish uchun qaysi klavishlar kombinatsiyasi ishlatiladi?", 
+a:["CTRL + SHIFT + O","CTRL + N","ALT + N","ALT + O"], c:1},
+
+{q:"24. =ДЛСТР(СЖПРОБЕЛЫ(\"  salom  \")) ?", 
+a:["5","7","6","4"], c:0},
+
+{q:"25. Excel dagi ifodaning natijasini aniqlang. =КОРЕНЬ(ДЛСТР('informatika')+ДЛСТР(ЛЕВСИМВ('informatika';5)) ", 
+a:["6","4","5","3"], c:1},  // <-- vergul qo‘shildi
+
+{q:"26. Slayd nima?", 
+a:["Bitta sahifa", "Bitta qator", "Ikkita bayt", "Bitta rasm"], c:0},
+
+{q:"27. Insert picture nima vazifani bajaradi?", 
+a:[
+"Rasm qo‘shish",
+"Matn qo‘shish",
+"Tablitsa qo‘shish",
+"Diagramma qo‘shish"
+], c:0},
+
+{q:"28. Agar hujjatda Heading stillari noto‘g‘ri qo‘llangan bo‘lsa, mundarija qanday holatda bo‘ladi?", 
+a:[
+"To‘liq chiqadi",
+"Umuman chiqmaydi",
+"Qisman yoki noto‘g‘ri chiqadi",
+"Faqat rasmlar chiqadi"
+], c:2},
+
+{q:"29. Wrap Text → Behind Text va In Front of Text farqi nimada?", 
+a:[
+"Bir xil ishlaydi",
+"Faqat rang farqi bor",
+"Rasm matn ostida yoki ustida joylashadi",
+"Faqat printda ishlaydi"
+], c:2},
+
+{q:"30. Word’da Section Break qo‘yilmasa nima muammo yuz beradi?", 
+a:[
+"Rasm qo‘shilmaydi",
+"Faqat shrift o‘zgaradi",
+"Sahifalar mustaqil formatlanmaydi",
+"Fayl saqlanmaydi"
+], c:2},
+
+{q:"31. Mail Merge’da asosiy 3 komponent qaysilar?", 
+a:[
+"Table, Chart, Text",
+"Main document, Data source, Merge field",
+"Insert, Layout, Design",
+"Header, Footer, Page"
+], c:1},
+
+{q:"32. Optimize for Standard va Minimum size farqi nimada?", 
+a:[
+"Format farqi yo‘q",
+"Fayl nomi o‘zgaradi",
+"Sifat va hajm balansida farq bor",
+"Faqat printerga ta’sir qiladi"
+], c:2},
+
+{q:"33. CMD’da cd .. buyrug‘i ketma-ket 3 marta yozilsa nima bo‘ladi?", 
+a:[
+"Papka o‘chadi",
+"3 daraja yuqoriga chiqadi",
+"Disk o‘zgaradi",
+"Xatolik beradi"
+], c:1},
+
+{q:"34. ipconfig va ping buyruqlari o‘rtasidagi asosiy farq nima?", 
+a:[
+"Ikkalasi ham bir xil",
+"Biri IP ko‘rsatadi, biri aloqa tekshiradi",
+"Ikkalasi ham tezlik o‘lchaydi",
+"Faqat admin ishlatadi"
+], c:1},
+
+{q:"35. tasklist va netstat buyruqlari vazifasi nimada farqlanadi?", 
+a:[
+"Ikkalasi fayl o‘chiradi",
+"Biri jarayonlar, biri tarmoq ulanishlari",
+"Ikkalasi disk tekshiradi",
+"Farqi yo‘q"
+], c:1},
+
+{q:"36. shutdown /r va shutdown /s farqi nimada?", 
+a:[
+"Bir xil",
+"Biri restart, biri o‘chirish",
+"Ikkalasi sleep qiladi",
+"Faqat admin ishlatadi"
+], c:1},
+
+{q:"37. Win + Tab va Alt + Tab farqi nimada?", 
+a:[
+"Bir xil",
+"Biri timeline, biri tez almashish",
+"Ikkalasi ham yopadi",
+"Faqat dizayn farqi"
+], c:1},
+
+{q:"38. Clipboard history (Win + V) ishlashi uchun nima talab qilinadi?", 
+a:[
+"Internet",
+"Oldindan yoqilgan bo‘lishi",
+"Admin huquq",
+"Word ochiq bo‘lishi"
+], c:1},
+
+{q:"39. Word’da Format Painter bir necha joyda ishlatilishi uchun nima qilinadi?", 
+a:[
+"Bir marta bosish",
+"Ikki marta bosish",
+"Ctrl bosish",
+"Shift bosish"
+], c:1},
+
+{q:"40. Table Header’ni har sahifada chiqarmaslik muammosi nimadan bo‘lishi mumkin?", 
+a:[
+"Font kichik",
+"Repeat Header Rows yoqilmagan",
+"Printer xato",
+"Margin noto‘g‘ri"
+], c:1},
+
+{q:"41. Word’da Track Changes yoqilgan bo‘lsa nima sodir bo‘ladi?", 
+a:[
+"Fayl o‘chadi",
+"Barcha o‘zgarishlar qayd etiladi",
+"Rasm o‘chadi",
+"Faqat admin ko‘radi"
+], c:1},
+
+{q:"42. VLOOKUP va INDEX+MATCH farqi nimada?", 
+a:[
+"Bir xil",
+"INDEX+MATCH moslashuvchan va kuchliroq",
+"VLOOKUP tezroq har doim",
+"INDEX ishlamaydi"
+], c:1},
+
+{q:"43. Excel’da MOD va INT funksiyalari kombinatsiyasi nima beradi?", 
+a:[
+"Faqat qoldiq",
+"Butun va qoldiq ajratish",
+"Daraja",
+"Logarifm"
+], c:1},
+
+{q:"44. Word’da Page Break va Section Break farqi nimada?", 
+a:[
+"Bir xil",
+"Biri faqat yangi sahifa, biri formatni ajratadi",
+"Ikkalasi ham format o‘zgartiradi",
+"Faqat printer uchun"
+], c:1},
+
+{q:"45. Agar hujjatda bir nechta section bo‘lsa Header/Footer qanday ishlaydi?", 
+a:[
+"Hamma joyda bir xil",
+"Har section alohida sozlanadi",
+"Faqat birinchi sahifa",
+"Ishlamaydi"
+], c:1},
+
+{
+    q: "46. SQL so‘rovi natijasiga ko‘ra maoshlar farqi nechaga teng?",
+    a: ["1 485 762", "1 900 260", "2 000 000", "1 600 000"],
+    c: 1
+  },
+
+  {
+    q: "47. SELECT:TR ekranga nima chiqaradi?",
+    a: ["Familiyasi, Ism, Sharifi",  "Familiyasi, Ism, Maoshi", "Ismi, Toyifasi, Maoshi", "Ismi, Sharifi, Maoshi"],
+    c: 2
+  },
+
+  {
+    q: "48. Access dasturida DElETE nima vazifani bajaradi?",
+    a: [
+      "Ma'lumotlarni saqlaydi",
+      "Ma'lumotlarni tahrirlaydi",
+      "Ma'lumotlarni o'chiradi",
+      "Ma'lumotlarni ko'rsatadi"
+    ],
+    c: 2
+  },
+
+  {
+    q: "49. Accessda WHERE bu nima vazifani bajaradi?",
+    a: [
+      "So'ro'v qilish",
+      "Savol va Javob qilish",
+      "Ma'lumotlarni filtrlash",
+      "Yozuv joylashtirish"
+    ],
+    c: 0
+  },
+  {
+    q: "50. Access qaysi dasturga tegishli?",
+    a: [
+      "Word",
+      "Excel",
+      "PowerPoint",
+      "Microsoft Office"
+    ],
+    c: 3
+  }
+];
+
+
+const form = document.getElementById("quizForm");
+
+
+
+
+
+
+// Aralashtirish funksiyasi
+function shuffleArray(array) {
+    for (let i = array.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [array[i], array[j]] = [array[j], array[i]];
+    }
+    return array;
+}
+
+// Savollarni va javoblarni aralashtirish
+const questionsShuffled = questions.map(q => {
+    // q = {q:"savol", a:[..], c:correctIndex}
+    const answers = q.a.map((ans, idx) => ({ans, idx}));
+    const correctIdx = q.c;
+
+    // Javoblarni aralashtirish
+    shuffleArray(answers);
+
+    // Yangi to‘g‘ri javob indexini topish
+    const newCorrect = answers.findIndex(a => a.idx === correctIdx);
+
+    // Yangi arrayga joylash
+    return {
+        q: q.q,
+        a: answers.map(a => a.ans),
+        c: newCorrect
+    };
+});
+// Timer funksiyasi
+let totalTime = 50 * 60; // 50 daqiqa (soniya)
+
+const timerEl = document.getElementById("timer");
+
+const timerInterval = setInterval(() => {
+    let minutes = Math.floor(totalTime / 60);
+    let seconds = totalTime % 60;
+
+    timerEl.textContent =
+        `${minutes}:${seconds < 10 ? "0" + seconds : seconds}`;
+
+    if (totalTime <= 0) {
+        clearInterval(timerInterval);
+        alert("Vaqt tugadi! Test yakunlandi.");
+        finishTest(); // avtomatik natijaga o‘tadi
+    }
+
+    totalTime--;
+}, 1000);
+
+// Endi questionsShuffled ni formaga chiqarish mumkin
+console.log(questionsShuffled);
+
+questions.forEach((item, index) => {
+ let html = `<div class="question"><b>${item.q}</b><div class="answers">`;
+ item.a.forEach((ans, i) => {
+   html += `<label>
+   <input type="radio" name="q${index}" value="${i}"> ${ans}
+   </label>`;
+ });
+ html += `</div></div>`;
+ form.innerHTML += html;
+});
+
+const submitBtn = document.getElementById("submitBtn");
+
+// Funktsiya: barcha savollarda javob belgilanganini tekshiradi
+function checkAllAnswered() {
+  let allAnswered = true;
+  questions.forEach((q, i) => {
+    const sel = document.querySelector(`input[name="q${i}"]:checked`);
+    if (!sel) allAnswered = false;
+  });
+
+  submitBtn.disabled = !allAnswered; // barcha javoblar bo'lsa tugma yoqilsin
+}
+
+// Har bir radio tugma bosilganda tekshirish
+questions.forEach((q, i) => {
+  const radios = document.querySelectorAll(`input[name="q${i}"]`);
+  radios.forEach(radio => {
+    radio.addEventListener("change", checkAllAnswered);
+  });
+});
+
+
+function send() {
+  // 1️⃣ Foydalanuvchi javoblarini yig‘ish
+  let answers = [];
+  questions.forEach((q, i) => {
+    let sel = document.querySelector(`input[name="q${i}"]:checked`);
+    answers.push(sel ? parseInt(sel.value) : null);
+  });
+
+  // 2️⃣ Natijani hisoblash
+  let score = 0;
+  questions.forEach((q, i) => {
+    if (answers[i] === q.c) score++;
+  });
+
+  // 3️⃣ Natijani Telegramga yuborish
+  const BOT_TOKEN = "8349378667:AAHSc_NKZqTEdz2t7Cvyqfudt3OV50pNrH8";
+  const CHAT_ID = "606391305";
+
+const fname = localStorage.getItem("fname") || "Ism yo‘q";
+const lname = localStorage.getItem("lname") || "Familiya yo‘q";
+
+const score1 = 45;   // to‘g‘ri javoblar soni
+const total = 50;   // jami savollar
+const TOKEN = "8349378667:AAHSc_NKZqTEdz2t7Cvyqfudt3OV50pNrH8";
+
+const SHEETS_ID = "1ie9wu_BbfANAAO8ME7nzbkm7WKQIzhJ1D1U09pL0SbY"; // o'zingizning Google Sheets ID sini kiriting
+
+function sendResult(togri, jami) {
+    const url = `https://api.telegram.org/bot8349378667:AAHSc_NKZqTEdz2t7Cvyqfudt3OV50pNrH8/setWebhook?url=https://script.google.com/macros/s/AKfycbxBxHn4IxGeL8TZYHyVCnKuLL5o43Qio842iwEcWW39QNgb2cU7K8lNeviAP3LsTbw6/exec`;
+  fetch(SHEETS_URL, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({
+      ism: "Talaba",
+      familiya: "Test",
+      togri: togri,
+      jami: jami,
+      natija: togri >= 45 ? "OTDI" : "OTMADI"
+    })
+  })
+  .then(() => alert("Natija yuborildi"))
+  .catch(() => alert("Xatolik"));
+}
+function doPost(e) {
+  try {
+    var data = JSON.parse(e.postData.contents);
+    var msg = data.message;
+
+    var sheet = SpreadsheetApp.openById(
+      "1rie9wu_BbfANAAO8ME7nzbkm7WKabcd123"
+    ).getSheets()[0];
+
+    var fullName = ((msg.from.first_name || "") + " " + (msg.from.last_name || "")).trim();
+
+    sheet.appendRow([
+      new Date(),
+      msg.chat.id,
+      fullName,
+      msg.from.username || "",
+      msg.text || ""
+    ]);
+
+    return ContentService.createTextOutput("OK");
+  } catch (err) {
+    return ContentService.createTextOutput("ERROR: " + err);
+  }
+}
+
+function sendMessage(chatId, text) {
+  const url = `https://api.telegram.org/bot${TOKEN}/sendMessage`;
+  const payload = {
+    chat_id: chatId,
+    text: text
+  };
+
+  UrlFetchApp.fetch(url, {
+    method: "post",
+    contentType: "application/json",
+    payload: JSON.stringify(payload)
+  });
+}
+
+  let resultText = `
+📄 <b>CMD + WIN + WORD IMTIHON NATIJASI</b>
+
+👤 Ism: ${fname}
+👤 Familiya: ${lname}
+
+✅ To‘g‘ri javoblar: ${score}
+❌ Noto‘g‘ri javoblar: ${total - score}
+📊 Jami savollar: ${total}
+
+🏁 ${score >= 45 ? "IMTIHONDAN O‘TDI ✅" : "IMTIHONDAN O‘TMADI ❌"}
+`;
+
+  fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      chat_id: CHAT_ID,
+      text: resultText,
+      parse_mode: "HTML"
+    })
+  })
+  .then(r => r.json())
+  .then(d => {
+    if(d.ok){
+      alert("Natijalarni ko'rishga tayyormisiz ✅");
+    } else {
+      alert("XATO: token yoki chat_id noto‘g‘ri");
+    }
+
+    // 4️⃣ Natijani localStorage ga saqlash va result.html ga o‘tish
+    localStorage.setItem("questions", JSON.stringify(questions));
+    localStorage.setItem("answers", JSON.stringify(answers));
+    window.location.href = "result.html";
+  })
+  .catch(e => alert("Fetch ishlamadi: " + e));
+}
+
+  // 🔹 GOOGLE SHEETS (GAS) GA YUBORISH
+  fetch(GAS_URL, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      fname: fname,
+      lname: lname,
+      score: score,
+      total: total,
+      date: new Date().toLocaleString()
+    })
+  })
+  .then(() => {
+    alert("Natija yuborildi ✅");
+    localStorage.setItem("questions", JSON.stringify(questions));
+    localStorage.setItem("answers", JSON.stringify(answers));
+    window.location.href = "result.html";
+  })
+  .catch(err => alert("Xatolik: " + err));
+
+
+
+const GAS_URL = "https://script.google.com/macros/s/AKfycbzvrmgyr052X9wBZqx60pg_70kbNgO8sDQX17Lvpl8hjo2LLTiJ8VtuvHJoOy71keMn/exec";
+
+function sendResultToGoogle(fname, lname, score, total) {
+  fetch(GAS_URL, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({
+      fname: fname,
+      lname: lname,
+      score: score,
+      total: total
+    })
+  })
+  .then(() => {
+    console.log("Google Sheets ga yuborildi");
+  })
+  .catch(err => {
+    alert("Google Sheets xatolik: " + err);
+  });
+}
+
+history.pushState(null, null, location.href);
+
+window.onpopstate = function () {
+  history.pushState(null, null, location.href);
+};
+
+sendResultToGoogle(fname, lname, score, total);
+ 
+if(data.img){
+  let image = document.createElement("img");
+  image.src = data.img;
+  image.width = 200;
+  box.appendChild(image);
+}
+
+</script>
+
+</body>
+</html>          
+
+
+
+
+
+
+
+ 
